@@ -1,0 +1,15 @@
+- *.a
+- *.h
+- *.c
+- *.o
+- *.pc
+- usr/include
+- THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
+- *.la
+- *.lo
+- /usr/share/man
+- /usr/share/info
+- /usr/share/doc
+- /usr/man
+- /usr/info
+- /usr/doc

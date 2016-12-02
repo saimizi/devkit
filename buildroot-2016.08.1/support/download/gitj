@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for git, to be called from the download wrapper script
+#
+# Call it as:
+#   .../git [-q] OUT_FILE REPO_URL CSET BASENAME
+#
+# Environment:
+#   GIT      : the git command to call
+
+verbose=
+while getopts :q OPT; do
+    case "${OPT}" in
+    q)  verbose=-q; exec >/dev/null;;
+    \?) printf "unknown option '%s'\n" "${OPTARG}" >&2; exit 1;;
+    esac
+done
+shift $((OPTIND-1))
+
+output="${1}"
+repo="${2}"
+cset="${3}"
+basename="${4}"
+
+# Caller needs to single-quote its arguments to prevent them from
+# being expanded a second time (in case there are spaces in them)
+_git() {
+    eval ${GIT} "${@}"
+}
+
+here=`pwd`
+cd $output
+if _git clone ${verbose}  --depth 1 --no-single-branch -b "'${cset}'" "'${repo}'" "'${basename}'"; then
+	echo "Shallow clone successed."
+else
+	echo  "Shallow clone Doing full clone."
+	if _git clone ${verbose}  -b "'${cset}'" "'${repo}'" "'${basename}'"; then
+		echo "Full clone download successed."
+	else
+		exit 1
+	fi
+fi
+cd $here
+

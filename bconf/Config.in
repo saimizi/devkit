@@ -1,0 +1,78 @@
+config BR2_BCONF
+	bool "Bconf packages support."
+
+choice BR2_BF_BOARD
+	depends on BR2_BCONF
+	prompt "Target Board"
+
+config BR2_BF_PANDABOARD_ES
+	bool "Pandaboard ES"
+endchoice
+
+config BR2_BF_GIT_SERVER
+	string "Bconf package git repository"
+	depends on BR2_BCONF
+	default ""
+
+config BR2_BF_GIT_SERVER_LOCAL
+	string "Bconf package local git repository"
+	depends on BR2_BCONF && !BR2_BF_PANDABOARD_ES
+	default ""
+
+config BR2_BF_TFTP_DIR
+	string "TFTP directory"
+	depends on BR2_BCONF && BR2_BF_PANDABOARD_ES
+	default "/tftpboot"
+
+choice
+	prompt "Boot method"
+	depends on BR2_BF_PANDABOARD_ES
+
+config BR2_BF_BOOT_METHOD_NFSBOOT
+	bool "NFS boot"
+
+config BR2_BF_BOOT_METHOD_FLASH
+	bool "Flash boot"
+
+endchoice
+
+config BR2_BF_NFSROOT_PATH
+	string "NFSRoot path"
+	depends on BR2_BCONF
+	default "$(BASE_DIR)/nfsroot"
+
+config BR2_BF_TARGET_IP
+	string 
+	depends on BR2_BF_NFSBOOT
+	option env="TARGET_IP"
+
+config BR2_BF_SERVER_IP
+	string 
+	depends on BR2_BF_NFSBOOT
+	option env="SERVER_IP"
+
+config BR2_BF_NETMSK
+	string 
+	depends on BR2_BF_NFSBOOT
+	option env="NETMASK"
+
+config BR2_BF_GATEWAY
+	string 
+	depends on BR2_BF_NFSBOOT
+	option env="GATEWAY_IP"
+
+config BR2_BF_MEMORY
+	string "System memory"
+	depends on BR2_BCONF
+	default "1024M"
+
+config BR2_BF_BOOTARGS_APPEND
+	string "Other Linux boot args"
+	depends on BR2_BCONF
+	default ""
+
+comment "Packages needs Bconf package git repository"
+	depends on BR2_BF_GIT_SERVER = ""
+
+
+source "$BR2_EXTERNAL/package/Config.in"

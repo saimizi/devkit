@@ -1,0 +1,22 @@
+menu "Packages"
+	depends on BR2_BF_GIT_SERVER != ""
+
+menu "Base package"
+endmenu
+
+menu "Drivers"
+menu "WiFi Driver"
+endmenu
+endmenu
+
+menu "Libraies"
+source "$BR2_EXTERNAL/package/libtrace/Config.in"
+endmenu
+
+menu "Applications"
+source "$BR2_EXTERNAL/package/bf_ltrace/Config.in"
+source "$BR2_EXTERNAL/package/udaemon/Config.in"
+source "$BR2_EXTERNAL/package/netmgr/Config.in"
+endmenu
+
+endmenu

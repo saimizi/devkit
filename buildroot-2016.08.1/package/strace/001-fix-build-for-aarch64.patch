@@ -1,0 +1,14 @@
+diff --git a/sigreturn.c b/sigreturn.c
+index 648bd0a..50e76fa 100644
+--- a/sigreturn.c
++++ b/sigreturn.c
+@@ -13,6 +13,9 @@
+ # error NSIG < 32
+ #endif
+ 
++extern uint64_t *const aarch64_sp_ptr;
++extern uint32_t *const arm_sp_ptr;
++
+ int
+ sys_sigreturn(struct tcb *tcp)
+ {

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+export TARGET_IP=192.168.0.3
+export SERVER_IP=192.168.0.2
+export GATEWAY_IP=192.168.0.1
+export NETMASK=255.255.255.0
+
+
+
+# Do not modify following unless you know what you are doing...
+
+. ./tools/smake.sh

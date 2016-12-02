@@ -1,0 +1,3 @@
+config BR2_PACKAGE_NETMGR
+	bool "netmgr"
+	depends on BR2_BCONF
