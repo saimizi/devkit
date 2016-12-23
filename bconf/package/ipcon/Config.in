@@ -1,0 +1,7 @@
+comment "ipcon package needs libnl package"
+	depends on !BR2_PACKAGE_LIBNL
+
+config BR2_PACKAGE_IPCON
+	bool "ipcon"
+	depends on BR2_BCONF && BR2_PACKAGE_LIBNL
+

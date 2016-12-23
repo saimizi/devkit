@@ -1,0 +1,24 @@
+IPCON_VERSION = master
+IPCON_SITE = https://github.com/saimizi/ipcon.git
+IPCON_SITE_METHOD = gitj
+IPCON_INSTALL_STAGING = NO
+IPCON_INSTALL_TARGET = YES
+IPCON_AUTORECONF= YES
+
+IPCON_DEPENDENCIES= host-automake host-autoconf libnl
+
+BF_LINUX_PATH=$(BUILD_DIR)/linux
+
+define IPCON_CLEAN_CMDS
+	$(MAKE) -C $(@D) clean
+endef
+
+
+IPCON_DRV_OPTS= $(LINUX_MAKE_FLAGS)
+
+IPCON_CONF_OPTS += --with-ksrc=$(LINUX_DIR)
+IPCON_MAKE_OPTS += $(IPCON_DRV_OPTS)
+IPCON_INSTALL_TARGET_OPTS = $(IPCON_DRV_OPTS) DESTDIR=$(TARGET_DIR) install
+
+$(eval $(autotools-package))
+
