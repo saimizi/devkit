@@ -7,11 +7,15 @@ IPCON_AUTORECONF= YES
 
 IPCON_DEPENDENCIES= host-automake host-autoconf libnl
 
-BF_LINUX_PATH=$(BUILD_DIR)/linux
-
 define IPCON_CLEAN_CMDS
 	$(MAKE) -C $(@D) clean
 endef
+
+define IPCON_CREATE_M4
+	[ ! -d $(@D)/m4 ] && mkdir -p $(@D)/m4
+endef
+
+IPCON_POST_PATCH_HOOKS += IPCON_CREATE_M4
 
 
 IPCON_DRV_OPTS= $(LINUX_MAKE_FLAGS)
