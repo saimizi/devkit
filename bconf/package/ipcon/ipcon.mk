@@ -1,5 +1,5 @@
 IPCON_VERSION = master
-IPCON_SITE = https://github.com/saimizi/ipcon.git
+IPCON_SITE = https://github.com/saimizi/ipcon2.git
 IPCON_SITE_METHOD = gitj
 IPCON_INSTALL_STAGING = NO
 IPCON_INSTALL_TARGET = YES
@@ -12,7 +12,7 @@ define IPCON_CLEAN_CMDS
 endef
 
 define IPCON_CREATE_M4
-	[ ! -d $(@D)/m4 ] && mkdir -p $(@D)/m4
+	[ ! -d $(@D)/m4 ] && mkdir -p $(@D)/m4 || true
 endef
 
 IPCON_POST_PATCH_HOOKS += IPCON_CREATE_M4
