@@ -1,5 +1,5 @@
 LIBTRACE_VERSION = master
-LIBTRACE_SITE = $(BR2_BF_GIT_SERVER)/libtrace.git
+LIBTRACE_SITE = https://github.com/saimizi/libtrace.git
 LIBTRACE_SITE_METHOD = gitj
 LIBTRACE_INSTALL_STAGING = YES
 
@@ -8,13 +8,16 @@ define LIBTRACE_BUILD_CMDS
 endef
 
 define LIBTRACE_INSTALL_STAGING_CMDS
-	ROOTFS=$(STAGING_DIR) make install -C $(@D)
+	install -d $(STAGING_DIR)/usr/lib/
+	cp -d $(@D)/libtrace.so* $(STAGING_DIR)/usr/lib/
+	install -d $(STAGING_DIR)/usr/include/
+	install -m 0644 $(@D)/libtrace.h $(STAGING_DIR)/usr/include
 endef
 
 define LIBTRACE_INSTALL_TARGET_CMDS
-	install -d $(TARGET_DIR)/usr/local/lib/
-	cp -d $(@D)/libtrace.so* $(TARGET_DIR)/usr/local/lib/
-	install -d $(TARGET_DIR)/usr/local/bin/
+	install -d $(TARGET_DIR)/usr/lib/
+	cp -d $(@D)/libtrace.so* $(TARGET_DIR)/usr/lib/
+	install -d $(TARGET_DIR)/usr/bin/
 	install -m 0755 $(@D)/test/trace_test $(TARGET_DIR)/usr/local/bin/
 endef
 
