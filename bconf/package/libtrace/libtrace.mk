@@ -18,7 +18,7 @@ define LIBTRACE_INSTALL_TARGET_CMDS
 	install -d $(TARGET_DIR)/usr/lib/
 	cp -d $(@D)/libtrace.so* $(TARGET_DIR)/usr/lib/
 	install -d $(TARGET_DIR)/usr/bin/
-	install -m 0755 $(@D)/test/trace_test $(TARGET_DIR)/usr/local/bin/
+	install -m 0755 $(@D)/test/trace_test $(TARGET_DIR)/usr/bin/
 endef
 
 $(eval $(generic-package))
