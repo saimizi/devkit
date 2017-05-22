@@ -1,0 +1,379 @@
+#!/bin/bash
+
+check_op_name(){
+	local op
+	local op_name
+	local ops
+	local tp
+	local pkg
+
+	op=$1
+	op_name=$2
+	pkg=$3
+
+	ops="unknown"
+
+	if [ "x$op" = "x" ];then
+		return 1
+	fi
+
+	if [ "x$op_name" = "x" ];then
+		return 1
+	fi
+
+	if [ "x$pkg" = "x" ];then
+		return 1
+	fi
+
+	ops=`git branch | sed "s/\*//g"`
+	ops="$ops `git ls-remote 2>/dev/null | grep refs | grep heads | awk '{print $2}' | awk 'BEGIN{FS="/"}{print $NF}'`"
+
+	ops="$ops `git tag`"
+	ops="$ops `git ls-remote 2>/dev/null | grep refs | grep tags | awk '{print $2}' | awk 'BEGIN{FS="/"}{print $NF}' | grep -v "}$"`"
+
+	if [ "x$ops" = "xunknown" ];then
+		echo "Bad operations: $op."
+		return 1
+	fi
+
+	for tp in $ops
+	do
+		if [ $tp = $op_name ];then
+			echo "Error: \"$op_name\" already exists in $pkg"
+			return 1
+		fi
+	done
+
+# Modification check should not be used, for patch mechanism maybe used...
+#	tp=`git status | grep modified`
+#	if [ "x$tp" != "x" ];then
+#		echo "Error: $pkg is modified, commit and push it first."
+#		return 1
+#	fi
+
+	tp=`LANG=C git status | grep "ahead of"`
+	if [ "x$tp" != "x" ];then
+		echo "Error: $pkg is ahead of the remote repository, push it first."
+		return 1
+	fi
+
+	return 0
+}
+
+num_of_str(){
+	echo $#
+}
+
+get_package(){
+	local cname
+	local pname
+	local tp
+	local tmp
+	local ver
+	local mkfile
+	local pkgtype
+
+	mkfile=
+	pkgtype=
+
+	cname=`echo $1 | sed "s/^BR2_PACKAGE_//"`
+
+	if [ "x$cname" = "x" ];then
+		return
+	fi
+
+	pname=`echo $cname | tr '[:upper:]' '[:lower:]'`
+
+	if [ -d buildroot/package/${pname} ];then
+		mkfile=buildroot/package/${pname}/${pname}.mk
+		pkgtype="OSS"
+	fi
+
+	if [ -d bconf/package/${pname} ];then
+		pkgtype="BF"
+		mkfile=bconf/package/${pname}/${pname}.mk
+	fi
+
+	if [ "x$mkfile" = "x" ];then
+		return
+	fi
+
+	if [ ! -f $mkfile ];then
+		return
+	fi
+
+	tmp=`grep -nr "${cname}_SITE[[:blank:]]*=" $mkfile | awk 'BEGIN{FS="="}{print $2}' | sed "s/ //g"`
+
+	if ! [[ $tmp =~ "BR2_BF_GIT_SERVER" ]];then
+		pkgtype="OSS"
+	fi
+
+	ver=`grep -nr "^${cname}_VERSION[[:blank:]]*=" $mkfile | awk 'BEGIN{FS="="}{print $2}' | sed "s/ //g"`
+	if [ "x$ver" = "x" ];then
+		return
+	fi
+
+	tmp=`num_of_str $ver`
+	if [ $tmp -gt 1 ];then
+		ver="?"
+	fi
+
+	if [[ "x$ver" =~ "\$" ]];then
+		ver="?"
+	fi
+
+
+	echo ${pname}%${ver}%${pkgtype}
+}
+
+
+do_git(){
+	local config_file
+	local op
+	local op_name
+	local pkgs
+	local tmp
+	local present_branch
+	local rp
+	local mkfile
+	local sha
+	local result
+	local pkgtype
+	local ver
+	local tp
+	local p
+	local here
+	local name
+	local cname
+	local pname
+
+	result=OK
+
+	op=
+	op_name=$2
+
+	if [ ! -f .smake ];then
+		echo "No \".smake\" found."
+		echo "Make sure run this tool at the top directroy of a configured tree."
+		return
+	fi
+
+	if [ "x$op_name" = "x" ];then
+		echo "No branch/tag name specified."
+		return
+	fi
+
+	config_file=`cat .smake | sed "s/_defconfig$//"`
+
+	if [ "x$1" = "xbranch" ];then
+		op_name=${config_file}_B_${op_name}
+		echo "Create branch $op_name for $config_file."
+		echo
+		op=$1
+	fi
+
+	if [ "x$1" = "xtag" ];then
+		op_name=${config_file}_T_${op_name}
+		echo "Create tag $op_name for $config_file."
+		echo
+		op=$1
+	fi
+
+	if [ "x$op" = "x" ];then
+		echo "Invalid operation."
+		return
+	fi
+
+	echo "Check package buildroot"
+	check_op_name $op $op_name "buildroot"
+	if [ $? -ne 0 ];then
+		return
+	fi
+
+	pkgs=`cat .config | grep "^BR2_PACKAGE_BF_.*=y$" | sed "s/=y$//" | sed "s/ //g"`
+
+	if [ "x$pkgs" = "x" ];then
+		return
+	fi
+
+	for p in $pkgs
+	do
+		rp=`get_package $p`
+		if [ "x$rp" = "x" ];then
+			continue
+		fi
+
+		pname=`echo $rp | awk 'BEGIN{FS="%"}{print $1}'`
+		ver=`echo $rp | awk 'BEGIN{FS="%"}{print $2}'`
+		pkgtype=`echo $rp | awk 'BEGIN{FS="%"}{print $3}'`
+		name=${pname}-${ver}
+
+		if [ "x$pkgtype" = "xOSS" ];then
+			continue
+		fi
+
+		echo "Check package ${pname}"
+
+		if [ ! -d "build/${name}" ];then
+			echo "No ${name} found in build directory."
+			return
+		fi
+
+		here=`pwd`
+		cd build/${name}
+
+		check_op_name $op $op_name $name
+		if [ $? -ne 0 ];then
+			cd $here
+			return
+		fi
+
+		cd $here
+
+		tmp="$tmp $name"
+	done
+
+	pkgs=$tmp
+
+	present_branch=`git branch | awk '{print $2}'`
+	git checkout -b $op_name
+
+	if [ $? -ne 0 ];then
+		echo "Failed to create branch $op_name"
+		return
+	fi
+
+	for p in $pkgs
+	do
+		
+		name=$p
+		pname=`echo $name | awk 'BEGIN{FS="-"}{print $1}'`
+		ver=`echo $name | awk 'BEGIN{FS="-"}{print $2}'`
+		cname=`echo $pname | tr '[:lower:]' '[:upper:]'`
+		mkfile="bconf/package/${pname}/${pname}.mk"
+
+		cd build/$name
+
+		if [ $op = "branch" ];then
+			echo "Creating branch $op_name for $p"
+			git checkout -b $op_name
+			if [ $? -ne 0 ];then
+				echo "Failed to create branch $op_name for $p"
+				result=NG
+				cd $here
+				break
+			fi
+
+			echo "Push branch $op_name to remote"
+			git push origin $op_name
+			if [ $? -ne 0 ];then
+				echo "Failed to push branch $op_name to $site_path"
+				result=NG
+				cd $here
+				break
+			fi
+		fi
+
+		if [ $op = "tag" ];then
+			echo "Creating tag $op_name for $p"
+			git tag $op_name
+			if [ $? -ne 0 ];then
+				echo "Failed to create litght-weight tag $op_name for $p"
+				result=NG
+				cd $here
+				break
+			fi
+
+			echo "Push tag $op_name to remote"
+			git push origin $op_name
+			if [ $? -ne 0 ];then
+				echo "Failed to tag branch $op_name to remote repository."
+				result=NG
+				cd $here
+				break
+			fi
+		fi
+
+		cd $here
+
+		echo "Update mkfile $mkfile for $op $op_name"
+		sed -i "s/${cname}_VERSION[[:blank:]]*=[[:blank:]]*${ver}/${cname}_VERSION = ${op_name}/" $mkfile
+		git add $mkfile
+
+		echo 
+		echo
+	done
+
+	if [ "x$result" = "xOK" ];then
+		#Clean other configuration file
+		echo "Clean configuration file other than ${config_file}_defconfig."
+		tmp=`ls bconf/configs`
+		for tp in $tmp
+		do
+			if [ "$tp" != "${config_file}_defconfig" ];then
+				git rm bconf/configs/$tp
+			fi
+		done
+
+		git commit -m "New branch for $op $op_name."
+		git push origin $op_name
+	fi
+
+	git checkout $present_branch
+}
+
+show_version(){
+	local pkgs
+	local p
+	local tp
+	local name
+	local ver
+	local pkg_type
+
+	if [ ! -e .config ];then
+		return
+	fi
+
+	oss_result=
+	bf_result=
+	pkgs=`cat .config | grep "^BR2_PACKAGE_.*=y$" | sed "s/=y$//" | sed "s/ //g"`
+
+	if [ "x$pkgs" = "x" ];then
+		return
+	fi
+
+	echo "Packages version info"
+	echo "------------------------"
+	for p in $pkgs
+	do
+		tp=`get_package $p`
+
+		if [ "x$tp" = "x" ];then
+			continue
+		fi
+
+		name=`echo $tp | awk 'BEGIN{FS="%"}{print $1}'`
+		ver=`echo $tp | awk 'BEGIN{FS="%"}{print $2}'`
+		pkg_type=`echo $tp | awk 'BEGIN{FS="%"}{print $3}'`
+
+		if [ "x$name" = "x" ];then
+			continue
+		fi
+
+		if [ "x$ver" = "x" ];then
+			continue
+		fi
+
+		printf "\t%-20s\t: %-3s : %s\n" $name $pkg_type $ver
+		continue
+	done
+}
+
+git_tree_tag(){
+	do_git tag $1
+}
+
+git_tree_branch(){
+	do_git branch $1
+}
+

@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # This tool is supposed to be run as current shell function.
-# so all varibles used will be the environment variable of current shell and
-# attention should be paid
+# so all varibles used will be the environment variable of current shell and attention should be paid
 
 
 # unset all variables here firstly to clear the old values.
@@ -15,6 +14,7 @@ unset -f smake_list
 unset -f smake_clear_config_settings
 unset -f smake_forgetme
 unset -f smake_is_broken
+orig_make=`which make`
 
 smake_forgetme(){
 		unset smake_conf_top
@@ -25,11 +25,18 @@ smake_forgetme(){
 		unset -f smake_list
 		unset -f smake_clear_config_settings
 		unset -f smake_forgetme
+		unset -f make
+		unset -f check_op_name
+		unset -f num_of_str
+		unset -f get_package
+		unset -f do_git
+		unset -f show_version
+		unset -f git_tree_tag
+		unset -f git_tree_branch
 }
 
 smake_conf_top=`pwd`
 smake_env=.smake
-omake=/usr/bin/make
 
 if [[ $smake_conf_top =~ "-" ]];then
 	echo "smake can not be configured under a directory that has \"-\" in pathname."
@@ -198,7 +205,7 @@ smake_init(){
 
 	if [ "x$1" != "x"  ];then
 		if [[ ! $1 =~ ^[0-9]+$ ]];then
-			$omake BR2_EXTERNAL=../bconf $1 O=.. -C buildroot
+			$orig_make BR2_EXTERNAL=../bconf $1 O=.. -C buildroot
 			if [  -f .config ];then
 				smake_conf_file=$1
 				echo
@@ -230,9 +237,9 @@ smake_init(){
 	fi
 
 	if [ "x$sel" == "x" ];then
-		$omake BR2_EXTERNAL=../bconf menuconfig O=.. -C buildroot
+		$orig_make BR2_EXTERNAL=../bconf menuconfig O=.. -C buildroot
 		if [ -f .config ];then
-			$omake savedefconfig
+			$orig_make savedefconfig
 			echo 
 			echo "New created configuration (defconfig) created, move it to bconf/configs with a meaningful name."
 			echo "Seletct it by running smake init again."
@@ -259,7 +266,7 @@ smake_init(){
 	done
 	
 	if [ "x$config_f" != "x" ];then
-		$omake BR2_EXTERNAL=../bconf $config_f O=.. -C buildroot
+		$orig_make BR2_EXTERNAL=../bconf $config_f O=.. -C buildroot
 		if [  -f .config ];then
 			smake_conf_file=$config_f
 			echo
@@ -319,18 +326,20 @@ smake(){
 
 	if [ "x$1" = "xlist" ];then
 		smake_list
+		cd $here
 		return
 	fi
 
 	if [ "x$1" = "xinfo" ];then
 		echo
-		echo -e "Top dir\t\t\t: $smake_conf_top"
+		echo -e "Top directory\t: $smake_conf_top"
 		if [ "x$smake_conf_file" != "x" ]; then
-			echo -e "Current configuration\t: $smake_conf_file"
+			echo -e "Current \t: $smake_conf_file"
 		else
-			echo -e "Current configuration\t: Not selected."
+			echo -e "Current \t: Not selected."
 		fi
 		smake_list
+		show_version
 		cd $here
 		return
 	fi
@@ -366,13 +375,13 @@ smake(){
 				fi
 				if [ "x$1" = "xdistclean" ];then
 					if [ -f Makefile ];then
-						$omake distclean
+						$orig_make distclean
 						rm Makefile 2>/dev/null
 					fi
 					smake_clear_config_settings
 				else
 					if [ -f Makefile ];then
-						$omake clean
+						$orig_make clean
 					fi
 				fi
 			fi
@@ -393,31 +402,45 @@ smake(){
 			cmd=$1
 			shift
 			echo "Exec: make ${package}-${cmd} $*"
-			$omake ${package}-${cmd} $*
+			$orig_make ${package}-${cmd} $*
 		else
 			cmd=rebuild
 			shift
 			echo "Exec: make ${package}-rebuild $*"
-			$omake ${package}-${cmd} $*
+			$orig_make ${package}-${cmd} $*
 		fi
 	else
 		echo "Exec: make ${*}"
-		$omake $*
+		$orig_make $*
 	fi
 
 	cd $here	
 }
 
-make(){
+# Override "make" with smake if the current is a working directory
+# While, if we are in test directory, use original make.
+make() {
 	local here
 
 	here=`pwd`
+
 	if [[ $here =~ $smake_conf_top ]];then
+		if [[ $here =~ "/test" ]];then
+			$orig_make $*
+			return
+		fi
+
+		if [[ $here =~ "/nfsroot" ]];then
+			$orig_make $*
+			return
+		fi
+
 		smake $*
-	else
-		$omake $*
+		return
 	fi
+
+	$orig_make $*
 
 }
 
-echo "smake configured."
+echo "smake/make configured."

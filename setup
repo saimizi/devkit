@@ -6,8 +6,11 @@ export SERVER_IP=192.168.0.2
 export GATEWAY_IP=192.168.0.1
 export NETMASK=255.255.255.0
 
+# This is just for easy to use cross-compile toolchain at command line.
+export PATH=${PWD}/host/usr/bin:${PATH}
 
 
 # Do not modify following unless you know what you are doing...
 
 . ./tools/smake.sh
+. ./tools/git_tree
