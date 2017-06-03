@@ -329,6 +329,15 @@ endif
 $(BUILD_DIR)/%/.stamp_dircleaned:
 	rm -Rf $(@D)
 
+# clean dir
+$(BUILD_DIR)/%/.stamp_cleaned:
+	@$(call step_start,clean)
+	@$(call MESSAGE,"Cleaning")
+	+$($(PKG)_CLEAN_CMDS)
+	@$(call step_end,clean)
+
+
+
 ################################################################################
 # virt-provides-single -- check that provider-pkg is the declared provider for
 # the virtual package virt-pkg
@@ -581,6 +590,7 @@ $(2)_TARGET_EXTRACT =		$$($(2)_DIR)/.stamp_extracted
 $(2)_TARGET_SOURCE =		$$($(2)_DIR)/.stamp_downloaded
 $(2)_TARGET_ACTUAL_SOURCE =	$$($(2)_DIR)/.stamp_actual_downloaded
 $(2)_TARGET_DIRCLEAN =		$$($(2)_DIR)/.stamp_dircleaned
+$(2)_TARGET_CLEAN =		$$($(2)_DIR)/.stamp_cleaned
 
 # default extract command
 $(2)_EXTRACT_CMDS ?= \
@@ -766,6 +776,9 @@ $(1)-all-legal-info:	$$(foreach p,$$($(2)_FINAL_ALL_DEPENDENCIES),$$(p)-all-lega
 
 $(1)-dirclean:		$$($(2)_TARGET_DIRCLEAN)
 
+$(1)-clean:		$$($(2)_TARGET_CLEAN)
+			rm -f $$($(2)_TARGET_BUILD)
+
 $(1)-clean-for-reinstall:
 ifneq ($$($(2)_OVERRIDE_SRCDIR),)
 			rm -f $$($(2)_TARGET_RSYNC)
@@ -806,6 +819,7 @@ $$($(2)_TARGET_SOURCE):			PKGDIR=$(pkgdir)
 $$($(2)_TARGET_ACTUAL_SOURCE):		PKG=$(2)
 $$($(2)_TARGET_ACTUAL_SOURCE):		PKGDIR=$(pkgdir)
 $$($(2)_TARGET_DIRCLEAN):		PKG=$(2)
+$$($(2)_TARGET_CLEAN):			PKG=$(2)
 
 # Compute the name of the Kconfig option that correspond to the
 # package being enabled. We handle three cases: the special Linux
