@@ -75,4 +75,4 @@ comment "Packages needs Bconf package git repository"
 	depends on BR2_BF_GIT_SERVER = ""
 
 
-source "$BR2_EXTERNAL/package/Config.in"
+source "$BR2_EXTERNAL_BCONF_PATH/package/Config.in"

@@ -10,14 +10,14 @@ endmenu
 endmenu
 
 menu "Libraies"
-source "$BR2_EXTERNAL/package/libtrace/Config.in"
+source "$BR2_EXTERNAL_BCONF_PATH/package/libtrace/Config.in"
 endmenu
 
 menu "Applications"
-source "$BR2_EXTERNAL/package/bf_ltrace/Config.in"
-source "$BR2_EXTERNAL/package/udaemon/Config.in"
-source "$BR2_EXTERNAL/package/netmgr/Config.in"
-source "$BR2_EXTERNAL/package/ipcon/Config.in"
+source "$BR2_EXTERNAL_BCONF_PATH/package/bf_ltrace/Config.in"
+source "$BR2_EXTERNAL_BCONF_PATH/package/udaemon/Config.in"
+source "$BR2_EXTERNAL_BCONF_PATH/package/netmgr/Config.in"
+source "$BR2_EXTERNAL_BCONF_PATH/package/ipcon/Config.in"
 endmenu
 
 endmenu
