@@ -83,7 +83,15 @@ _all:
 else # umask / $(CURDIR) / $(O)
 
 # This is our default rule, so must come first
-all:
+all: pre_build
+
+pre_build:
+	echo "CC=$(TARGET_CC)" > $(BASE_DIR)/env.mk
+	echo "TARGET_DIR=$(TARGET_DIR)" >> $(BASE_DIR)/env.mk
+	echo "NFSROOTFS=$(BR2_BF_NFSROOT_PATH)" >> $(BASE_DIR)/env.mk
+	echo "CFLAGS=$(TARGET_CFLAGS)"  >> $(BASE_DIR)/env.mk
+	echo "LDFLAGS=$(TARGET_LDFLAGS)" >> $(BASE_DIR)/env.mk
+
 
 # Set and export the version string
 export BR2_VERSION := 2017.05
