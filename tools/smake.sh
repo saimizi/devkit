@@ -202,10 +202,9 @@ smake_init(){
 	fi
 
 	cd $smake_conf_top
-
 	if [ "x$1" != "x"  ];then
 		if [[ ! $1 =~ ^[0-9]+$ ]];then
-			$orig_make BR2_EXTERNAL=../bconf $1 O=.. -C buildroot
+			$orig_make BR2_EXTERNAL=../bconf $1 O=${smake_conf_top} -C buildroot
 			if [  -f .config ];then
 				smake_conf_file=$1
 				echo
@@ -237,7 +236,7 @@ smake_init(){
 	fi
 
 	if [ "x$sel" == "x" ];then
-		$orig_make BR2_EXTERNAL=../bconf menuconfig O=.. -C buildroot
+		$orig_make BR2_EXTERNAL=../bconf menuconfig O=${smake_conf_top} -C buildroot
 		if [ -f .config ];then
 			$orig_make savedefconfig
 			echo 
@@ -266,7 +265,7 @@ smake_init(){
 	done
 	
 	if [ "x$config_f" != "x" ];then
-		$orig_make BR2_EXTERNAL=../bconf $config_f O=.. -C buildroot
+		$orig_make BR2_EXTERNAL=../bconf $config_f O=${smake_conf_top} -C buildroot
 		if [  -f .config ];then
 			smake_conf_file=$config_f
 			echo

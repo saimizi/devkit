@@ -1,6 +1,6 @@
 LIBTRACE_VERSION = master
 LIBTRACE_SITE = https://github.com/saimizi/libtrace.git
-LIBTRACE_SITE_METHOD = gitj
+LIBTRACE_SITE_METHOD = git
 LIBTRACE_INSTALL_STAGING = YES
 
 define LIBTRACE_BUILD_CMDS
