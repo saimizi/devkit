@@ -90,7 +90,7 @@ fi
 # The .git dir would generate non reproducible tarballs as it depends on
 # the state of the remote server. It also would generate large tarballs
 # (gigabytes for some linux trees) when a full clone took place.
-rm -rf .git
+#rm -rf .git
 
 popd >/dev/null
 
