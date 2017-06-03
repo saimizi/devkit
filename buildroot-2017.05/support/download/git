@@ -76,6 +76,10 @@ fi
 # submodules.
 _git checkout -q "'${cset}'"
 
+if _git branch | grep "no branch" 1>/dev/null; then
+	_git checkout -b "'${cset}'"
+fi
+
 # Get date of commit to generate a reproducible archive.
 # %cD is RFC2822, so it's fully qualified, with TZ and all.
 date="$( _git log -1 --pretty=format:%cD )"
@@ -94,11 +98,16 @@ fi
 
 popd >/dev/null
 
-# Generate the archive, sort with the C locale so that it is reproducible
-find "${basename}" -not -type d >"${basename}.list"
-LC_ALL=C sort <"${basename}.list" >"${basename}.list.sorted"
-# Create GNU-format tarballs, since that's the format of the tarballs on
-# sources.buildroot.org and used in the *.hash files
-tar cf - --numeric-owner --owner=0 --group=0 --mtime="${date}" --format=gnu \
-         -T "${basename}.list.sorted" >"${output}.tar"
+## Generate the archive, sort with the C locale so that it is reproducible
+#find "${basename}" -not -type d >"${basename}.list"
+#LC_ALL=C sort <"${basename}.list" >"${basename}.list.sorted"
+## Create GNU-format tarballs, since that's the format of the tarballs on
+## sources.buildroot.org and used in the *.hash files
+#tar cf - --numeric-owner --owner=0 --group=0 --mtime="${date}" --format=gnu \
+#         -T "${basename}.list.sorted" >"${output}.tar"
+#gzip -n <"${output}.tar" >"${output}"
+
+
+echo ${basename} ${output} ${PWD}
+tar cf - ${basename} > "${output}.tar"
 gzip -n <"${output}.tar" >"${output}"
