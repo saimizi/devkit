@@ -24,9 +24,12 @@ if [ "x$nfs_root_path" != "x" ];then
 	if [ -d "${nfs_root_path}" ];then
 		fakeroot rsync -lpuacDHPE --chmod=a-s --exclude-from=${BASE_DIR}/bconf/rsync.exclude ${TARGET_DIR}/*  ${nfs_root_path}/  | grep -v "\/$"
 	fi
+
+	if [ -e ${HOST_DIR}/usr/bin/qemu-arm ];then
+		${HOST_DIR}/usr/bin/qemu-arm -L $nfs_root_path  `find ${HOST_DIR}/ -name "ldconfig"` -r $nfs_root_path
+	fi
 fi
 
-${HOST_DIR}/usr/bin/qemu-arm -L $nfs_root_path  `find ${HOST_DIR}/ -name "ldconfig"` -r $nfs_root_path
 
 echo
 echo "All built sucessfully."
