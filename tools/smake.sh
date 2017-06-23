@@ -14,6 +14,7 @@ unset -f smake_list
 unset -f smake_clear_config_settings
 unset -f smake_forgetme
 unset -f smake_is_broken
+unset -f run_qemu
 orig_make=`which make`
 
 smake_forgetme(){
@@ -33,6 +34,7 @@ smake_forgetme(){
 		unset -f show_version
 		unset -f git_tree_tag
 		unset -f git_tree_branch
+		unset -f run_qemu
 }
 
 smake_conf_top=`pwd`
@@ -244,7 +246,7 @@ smake_init(){
 			echo "Seletct it by running smake init again."
 		fi
 		smake_clear_config_settings
-		ret=0
+		ret=1
 		return $ret
 	fi
 
@@ -440,6 +442,24 @@ make() {
 
 	$orig_make $*
 
+}
+
+run_qemu(){
+	local here
+
+	if [ ! -e ${smake_conf_top}/cmd.sh ];then
+		echo "No qemu cmd script found."
+		return;
+	fi
+
+	here=`pwd`
+	cd $smake_conf_top
+	xterm -fa "Liberation Mono:size=11:antialias=false" ./cmd.sh &
+	cd $here;
+}
+
+stop_qemu(){
+	killall xterm
 }
 
 echo "smake/make configured."

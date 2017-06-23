@@ -7,6 +7,9 @@ choice BR2_BF_BOARD
 
 config BR2_BF_PANDABOARD_ES
 	bool "Pandaboard ES"
+
+config BR2_BF_QEMU_X86_64
+	bool "QEMU_X86_64"
 endchoice
 
 config BR2_BF_GIT_SERVER
