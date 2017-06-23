@@ -1,0 +1,49 @@
+#!/bin/bash
+
+dev=$1
+imgdir=$2
+
+if [ "x$dev" = "x" ];then
+	echo "no dev specified."
+	exit
+fi
+
+if [ ! -d "$imgdir" ];then
+	echo "no img dir specified."
+	exit
+fi
+
+if [ ! -f $imgdir/MLO ];then
+	echo "no MLO found."
+	exit
+fi
+
+if [ ! -f $imgdir/u-boot.img ];then
+	echo "no u-boot.img found."
+	exit
+fi
+
+if [ ! -f $imgdir/boot.scr ];then
+	echo "no boot.scr found."
+	exit
+fi
+
+if [ "x$dev" = "xsda" ];then
+	echo "No, no /dev/sda..."
+	exit
+fi
+
+# write bootloader
+# uboot will read boot.scr from 1st partition.
+sudo dd if=${imgdir}/MLO of=/dev/$dev count=1 seek=1 conv=notrunc bs=128k
+sudo dd if=${imgdir}/u-boot.img of=/dev/$dev count=2 seek=1 conv=notrunc bs=384k
+
+${0%/*}/mkcard.sh /dev/$dev
+
+mkdir .tmpmntboot
+sudo mount /dev/${dev}1 .tmpmntboot
+sudo cp ${imgdir}/boot.scr .tmpmntboot
+sudo sync
+sudo umount /dev/${dev}1 
+rm -fr .tmpmntboot
+
