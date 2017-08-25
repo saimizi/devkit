@@ -1,0 +1,36 @@
+From 424f7338227a50ac0ca980605f81d437c2cde65e Mon Sep 17 00:00:00 2001
+From: Seimizu Joukan <joukan.seimizu@gmail.com>
+Date: Thu, 10 Aug 2017 20:10:42 +0900
+Subject: [PATCH] Add ipcon driver to kernel build.
+
+---
+ net/netlink/Kconfig  | 2 ++
+ net/netlink/Makefile | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/netlink/Kconfig b/net/netlink/Kconfig
+index 5d6e8c0..a24a82c 100644
+--- a/net/netlink/Kconfig
++++ b/net/netlink/Kconfig
+@@ -8,3 +8,5 @@ config NETLINK_DIAG
+ 	---help---
+ 	  Support for NETLINK socket monitoring interface used by the ss tool.
+ 	  If unsure, say Y.
++
++source "net/netlink/ipcon/Kconfig"
+diff --git a/net/netlink/Makefile b/net/netlink/Makefile
+index e837917..9a2568d 100644
+--- a/net/netlink/Makefile
++++ b/net/netlink/Makefile
+@@ -2,7 +2,7 @@
+ # Makefile for the netlink driver.
+ #
+ 
+-obj-y  				:= af_netlink.o genetlink.o
++obj-y  				:= af_netlink.o genetlink.o ipcon/
+ 
+ obj-$(CONFIG_NETLINK_DIAG)	+= netlink_diag.o
+ netlink_diag-y			:= diag.o
+-- 
+2.7.4
+

@@ -128,4 +128,13 @@ config BR2_LINUX_KERNEL_EXT_AUFS_VERSION
 
 endif # aufs
 
+config BR2_LINUX_KERNEL_EXT_IPCON_DRIVER
+	bool "IPC Over Netlink(IPCON) support"
+	depends on BR2_BCONF
+	select BR2_PACKAGE_IPCON_DRIVER
+	help
+	  IPC Over Netlink(IPCON) support.
+
+	  See https://github.com/saimizi/ipcon-drv.git
+
 endmenu

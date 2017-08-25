@@ -6,6 +6,7 @@ endmenu
 menu "Drivers"
 menu "WiFi Driver"
 endmenu
+source "$BR2_EXTERNAL_BCONF_PATH/package/ipcon_driver/Config.in"
 endmenu
 
 menu "Libraies"
