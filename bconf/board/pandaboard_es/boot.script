@@ -1,8 +1,11 @@
 setenv ipaddr <TARGET_IP>
 setenv serverip <SERVER_IP>
+
+setenv fdtaddr 0x88000000
+setenv bootaddr 0x80008000
+
 usb start
 tftpboot 0x80000000 uEnv.txt
 env import -t 0x80000000 $filesize
-tftpboot 0x82000000 uImage
-bootm 0x82000000 
 
+run uenvboot

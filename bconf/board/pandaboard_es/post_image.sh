@@ -41,13 +41,7 @@ server_ip=$SERVER_IP
 gateway_ip=$GATEWAY_IP
 netmask_ip=$NETMASK
 
-if [ "x$boot_method" = "xNFSBOOT" ];then
-	cp ${BASE_DIR}/bconf/board/pandaboard_es/cmdline_nfs.txt uEnv.txt
-fi
-
-if [ "x$boot_method" = "xFLASH" ];then
-	cp ${BASE_DIR}/bconf/board/pandaboard_es/cmdline_flash.txt uEnv.txt
-fi
+cp ${BASE_DIR}/bconf/board/pandaboard_es/uEnv.script uEnv.txt
 
 sed -i "s/<MEM>/$mem/; \
 	s/<CONSOLE>/"$console_tty"/; \
@@ -60,6 +54,17 @@ sed -i "s/<MEM>/$mem/; \
 	s%<NFSROOTPATH>%${nfsroot_path}%; \
 	s/<APPEND>/$append/" \
 	uEnv.txt
+
+if [ "x$boot_method" = "xNFSBOOT" ];then
+	sed -i "s/<BOOT_TYPE>/uenvboot_nfs/" uEnv.txt
+	cp ${BINARIES_DIR}/zImage ${tftpboot_dir}
+	cp ${BINARIES_DIR}/*.dtb ${tftpboot_dir}
+fi
+
+if [ "x$boot_method" = "xFLASH" ];then
+	sed -i "s/<BOOT_TYPE>/uenvboot_rom/" uEnv.txt
+fi
+
 mv uEnv.txt $tftpboot_dir
 
 if [ ! -f ${BINARIES_DIR}/boot.scr ];then
@@ -73,8 +78,6 @@ if [ ! -f ${BINARIES_DIR}/boot.scr ];then
 	mv boot.scr ${BINARIES_DIR}/
 	rm boot.script
 fi
-
-
 
 . ${BASE_DIR}/bconf/board/common/post_image.sh
 

@@ -1,1 +1,0 @@
-bootargs=mem=<MEM> console=tty0,115200 console=ttyUSB0,115200 console=<CONSOLE>,<BRATE> rw init=init root=/dev/nfs ip=<TARGET_IP>:<SERVER_IP>:<GATEWAY_IP>:<NETMASK_IP>:<HOSTNAME>:eth0 nfsroot=<NFSROOTPATH> <APPEND>
