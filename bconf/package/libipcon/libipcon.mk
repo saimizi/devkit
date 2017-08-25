@@ -17,5 +17,9 @@ endef
 
 LIBIPCON_POST_PATCH_HOOKS += LIBIPCON_CREATE_M4
 
+ifeq ($(LIBIPCON_VERSION),master)
+LIBIPCON_POST_EXTRACT_HOOKS += GIT_PULL_TO_CURRENT
+endif
+
 $(eval $(autotools-package))
 
