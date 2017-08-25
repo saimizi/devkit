@@ -3,6 +3,10 @@ LIBTRACE_SITE = https://github.com/saimizi/libtrace.git
 LIBTRACE_SITE_METHOD = git
 LIBTRACE_INSTALL_STAGING = YES
 
+ifeq ($(LIBTRACE_VERSION),master)
+LIBTRACE_POST_EXTRACT_HOOKS += GIT_PULL_TO_CURRENT
+endif
+
 define LIBTRACE_BUILD_CMDS
 	 $(MAKE) CC=$(TARGET_CC) -j1 -C $(@D)
 endef
@@ -20,5 +24,6 @@ define LIBTRACE_INSTALL_TARGET_CMDS
 	install -d $(TARGET_DIR)/usr/bin/
 	install -m 0755 $(@D)/test/trace_test $(TARGET_DIR)/usr/bin/
 endef
+
 
 $(eval $(generic-package))
