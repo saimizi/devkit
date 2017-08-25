@@ -7,8 +7,8 @@
 LINUX_EXTENSIONS += ipcon_driver
 
 define IPCON_DRIVER_PREPARE_KERNEL
-	mkdir -p $(LINUX_DIR)/net/netlink/ipcon
-	cp -dpfr $(IPCON_DRIVER_DIR)/* $(LINUX_DIR)/net/netlink/ipcon/
+	rm -fr $(LINUX_DIR)/net/netlink/ipcon 2>/dev/null || true
+	ln -s $(IPCON_DRIVER_DIR) $(LINUX_DIR)/net/netlink/ipcon
 endef
 
 define IPCON_DRIVER_PATCH
