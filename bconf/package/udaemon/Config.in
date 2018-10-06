@@ -1,3 +1,0 @@
-config BR2_PACKAGE_UDAEMON
-	bool "udaemon"
-	depends on BR2_BCONF && (BR2_BF_PANDABOARD_ES)

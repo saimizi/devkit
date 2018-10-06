@@ -5,9 +5,6 @@ choice BR2_BF_BOARD
 	depends on BR2_BCONF
 	prompt "Target Board"
 
-config BR2_BF_PANDABOARD_ES
-	bool "Pandaboard ES"
-
 config BR2_BF_QEMU_X86_64
 	bool "QEMU_X86_64"
 endchoice
@@ -19,17 +16,16 @@ config BR2_BF_GIT_SERVER
 
 config BR2_BF_GIT_SERVER_LOCAL
 	string "Bconf package local git repository"
-	depends on BR2_BCONF && !BR2_BF_PANDABOARD_ES
+	depends on BR2_BCONF
 	default ""
 
 config BR2_BF_TFTP_DIR
 	string "TFTP directory"
-	depends on BR2_BCONF && BR2_BF_PANDABOARD_ES
+	depends on BR2_BCONF && !BR2_BF_QEMU_X86_64
 	default "/tftpboot"
 
 choice
 	prompt "Boot method"
-	depends on BR2_BF_PANDABOARD_ES
 
 config BR2_BF_BOOT_METHOD_NFSBOOT
 	bool "NFS boot"

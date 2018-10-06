@@ -1,4 +1,0 @@
-config BR2_PACKAGE_IPCON_DRIVER
-	bool ""
-	depends on BR2_BCONF
-

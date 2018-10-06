@@ -1,3 +1,0 @@
-config BR2_PACKAGE_BUS1
-	bool "bus1 driver"
-	depends on BR2_BCONF

@@ -1,4 +1,0 @@
-config BR2_PACKAGE_LIBBUS1
-	bool "libbus1"
-	depends on BR2_BCONF
-

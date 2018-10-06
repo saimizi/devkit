@@ -4,19 +4,13 @@ menu "Base package"
 endmenu
 
 menu "Drivers"
-menu "WiFi Driver"
-endmenu
-source "$BR2_EXTERNAL_BCONF_PATH/package/ipcon_driver/Config.in"
 endmenu
 
 menu "Libraies"
 source "$BR2_EXTERNAL_BCONF_PATH/package/libtrace/Config.in"
-source "$BR2_EXTERNAL_BCONF_PATH/package/libipcon/Config.in"
 endmenu
 
 menu "Applications"
-source "$BR2_EXTERNAL_BCONF_PATH/package/bf_ltrace/Config.in"
-source "$BR2_EXTERNAL_BCONF_PATH/package/udaemon/Config.in"
 source "$BR2_EXTERNAL_BCONF_PATH/package/netmgr/Config.in"
 endmenu
 
