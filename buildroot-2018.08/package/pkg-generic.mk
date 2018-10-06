@@ -320,6 +320,11 @@ $(BUILD_DIR)/%/.stamp_target_installed:
 		$(RM) -f $(addprefix $(TARGET_DIR)/usr/bin/,$($(PKG)_CONFIG_SCRIPTS)) ; \
 	fi
 	@$(call step_end,install-target)
+ifneq ($(BR2_BF_NFSROOT_PATH),)
+	(  test ! -d $(BR2_BF_NFSROOT_PATH) ) &&  mkdir $(BR2_BF_NFSROOT_PATH) || true
+	@$(call MESSAGE,"Synchronize to $(BR2_BF_NFSROOT_PATH)")
+	fakeroot rsync -lpuacDHPE --chmod=a-s --exclude-from=$(BR2_EXTERNAL)/rsync.exclude $(TARGET_DIR)/* $(BR2_BF_NFSROOT_PATH)/  | grep -v "\/$$"
+endif
 	$(Q)touch $@
 
 # Remove package sources
